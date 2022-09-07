@@ -21,21 +21,7 @@ export class Bagel {
     this.middlewares = [];
   }
 
-  use(router: Router): Bagel;
-  use(...middlewares: Handler[]): Bagel;
-  use(arg: Router | Handler, ...args: Handler[]): Bagel {
-    // Router
-    if (arg instanceof Router) {
-      const router = arg;
-      router.handlers.forEach((handlers, key) => {
-        this.handlers.set(key, [...this.middlewares, ...handlers]);
-      });
-      return this;
-    }
-
-    // Middlewares
-    const middlewares = args;
-
+  use(middlewares: Handler[]): Bagel {
     // Store middlewares
     this.middlewares.push(...middlewares);
 
@@ -103,9 +89,9 @@ export class Bagel {
       const key = `${bagelRequest.method} ${bagelRequest.path}`;
       const handlers = this.handlers.get(key);
 
-      // Throw error if there is no handlers for the route
+      // Return 404 if there is no handlers for the route
       if (!handlers) {
-        throw new Error(`Route handlers are missing for ${key}`);
+        return new Response('Not found', { status: 404 });
       }
 
       // Execute endpoint handlers

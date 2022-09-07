@@ -57,4 +57,13 @@ export class Router {
   register(method: Method, path: string, ...handlers: Handler[]) {
     this.handlers.set(`${method} ${normalizeURLPath(path)}`, handlers);
   }
+
+  mount(prefix: string, router: Router): Router {
+    router.handlers.forEach((handlers, key) => {
+      const [method, path] = key.split(' ');
+      const newKey = `${method} ${normalizeURLPath(prefix + path)}`;
+      this.handlers.set(newKey, [...this.middlewares, ...handlers]);
+    });
+    return this;
+  }
 }
