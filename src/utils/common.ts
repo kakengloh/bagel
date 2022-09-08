@@ -7,5 +7,3 @@ export const normalizeURLPath = (text: string): string => {
   // Remove trailing slash
   return text.replace(/\/+$/, '');
 };
-
-export const noop = () => {};

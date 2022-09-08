@@ -21,7 +21,7 @@ export class Bagel {
     this.middlewares = [];
   }
 
-  use(middlewares: Handler[]): Bagel {
+  use(...middlewares: Handler[]): Bagel {
     // Store middlewares
     this.middlewares.push(...middlewares);
 
@@ -95,10 +95,17 @@ export class Bagel {
       }
 
       // Execute endpoint handlers
-      for (const handler of handlers) {
-        await handler(bagelRequest, bagelResponse);
-      }
+      let index = 0;
+      while(index < handlers.length) {
+        const next = async () => {
+          const handler = handlers[index++];
+          if (!handler) return;
+          await handler(bagelRequest, bagelResponse, next);
+        }
 
+        await next();
+      }
+      
       return bagelResponse.done();
     };
 

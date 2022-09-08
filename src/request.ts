@@ -11,7 +11,10 @@ export type Handler<
 > = (
   req: BagelRequest<TPathParams, TQueryParams, TRequestBody>,
   res: BagelResponse<TResponseBody>,
+  next: Next,
 ) => Promise<any>;
+
+export type Next = () => Promise<any>;
 
 export class BagelRequest<
   TPathParams = Record<string, any>,
