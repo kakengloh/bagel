@@ -14,7 +14,23 @@ export type Handler<
   next: Next,
 ) => Promise<any>;
 
+export type AnyHandler = Handler<any, any, any, any>;
+
 export type Next = () => Promise<any>;
+
+export interface BagelRequestConstructor<
+  TPathParams,
+  TQueryParams,
+  TBodyParams,
+> {
+  method: Method;
+  path: string;
+  url: string;
+  headers: Record<string, any>;
+  params: TPathParams;
+  query: TQueryParams;
+  body: TBodyParams;
+}
 
 export class BagelRequest<
   TPathParams = Record<string, any>,
@@ -23,25 +39,40 @@ export class BagelRequest<
 > {
   public readonly method: Method;
   public readonly path: string;
+  public readonly url: string;
   public readonly headers: Record<string, any>;
   public readonly params: TPathParams;
   public readonly query: TQueryParams;
   public readonly body: TBodyParams;
 
-  constructor() {
-    throw new Error('Constructor should not be called directly');
+  constructor(
+    options: BagelRequestConstructor<TPathParams, TQueryParams, TBodyParams>,
+  ) {
+    this.method = options.method;
+    this.path = options.path;
+    this.url = options.url;
+    this.headers = options.headers;
+    this.params = options.params;
+    this.query = options.query;
+    this.body = options.body;
   }
 
-  static async from(req: Request): Promise<BagelRequest> {
+  static async from(req: Request, params: object): Promise<BagelRequest> {
     const { searchParams, pathname } = new URL(req.url);
 
-    return {
+    const body = await req.json();
+    if (body instanceof Error) {
+      throw body;
+    }
+
+    return new BagelRequest({
       method: req.method as Method,
       path: normalizeURLPath(pathname),
+      url: req.url,
       query: Object.fromEntries(searchParams.entries()),
-      params: {},
-      body: await req.json(),
+      params,
+      body: body as Record<string, any>,
       headers: Object.fromEntries(req.headers.entries()),
-    };
+    });
   }
 }

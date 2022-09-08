@@ -1,4 +1,4 @@
-import { Bagel } from "../src";
+import { Bagel } from '../src';
 
 const app = new Bagel();
 

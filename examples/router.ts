@@ -1,7 +1,7 @@
-import { Bagel, Router } from "../src";
+import { Bagel, Router } from '../src';
 
 const items = new Router();
-items.get('/', async (req, res) => res.json({ items: [] }))
+items.get('/', async (req, res) => res.json({ items: [] }));
 
 const v1 = new Router();
 v1.mount('/items', items);

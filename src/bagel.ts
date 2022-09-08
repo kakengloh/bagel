@@ -1,8 +1,9 @@
 import { Errorlike, ServeOptions } from 'bun';
-import { RouteHandlers, Router } from './router';
-import { BagelRequest, Handler, Method } from './request';
+import { Router } from './router';
+import { AnyHandler, BagelRequest, Handler, Method } from './request';
 import { BagelResponse } from './response';
 import { normalizeURLPath } from './utils/common';
+import { Route } from './route';
 
 type ListenCallback = (err?: Errorlike) => void;
 
@@ -12,100 +13,109 @@ interface BagelOptions {
 
 export class Bagel {
   private readonly opts: BagelOptions;
-  private readonly handlers: RouteHandlers;
+  private readonly routes: Route[];
   private readonly middlewares: Handler[];
 
   constructor(opts: BagelOptions = {}) {
     this.opts = opts;
-    this.handlers = new Map();
+    this.routes = [];
     this.middlewares = [];
   }
 
-  use(...middlewares: Handler[]): Bagel {
+  use(...middlewares: AnyHandler[]): Bagel {
     // Store middlewares
     this.middlewares.push(...middlewares);
 
     // Append middlewares to existing routes
-    this.handlers.forEach((handlers, key) => {
-      this.handlers.set(key, [...handlers, ...middlewares]);
+    this.routes.forEach((route) => {
+      route.addHandlers(...middlewares);
     });
 
     return this;
   }
 
-  get(path: string, ...handlers: Handler[]): Bagel {
+  get(path: string, ...handlers: AnyHandler[]): Bagel {
     this.register('GET', path, ...this.middlewares, ...handlers);
     return this;
   }
 
-  post(path: string, ...handlers: Handler[]): Bagel {
+  post(path: string, ...handlers: AnyHandler[]): Bagel {
     this.register('POST', path, ...this.middlewares, ...handlers);
     return this;
   }
 
-  put(path: string, ...handlers: Handler[]): Bagel {
+  put(path: string, ...handlers: AnyHandler[]): Bagel {
     this.register('PUT', path, ...this.middlewares, ...handlers);
     return this;
   }
 
-  delete(path: string, ...handlers: Handler[]): Bagel {
+  delete(path: string, ...handlers: AnyHandler[]): Bagel {
     this.register('DELETE', path, ...this.middlewares, ...handlers);
     return this;
   }
 
-  patch(path: string, ...handlers: Handler[]): Bagel {
+  patch(path: string, ...handlers: AnyHandler[]): Bagel {
     this.register('PATCH', path, ...this.middlewares, ...handlers);
     return this;
   }
 
-  options(path: string, ...handlers: Handler[]): Bagel {
+  options(path: string, ...handlers: AnyHandler[]): Bagel {
     this.register('OPTIONS', path, ...this.middlewares, ...handlers);
     return this;
   }
 
-  register(method: Method, path: string, ...handlers: Handler[]): Bagel {
-    this.handlers.set(`${method} ${normalizeURLPath(path)}`, handlers);
+  register(method: Method, path: string, ...handlers: AnyHandler[]): Bagel {
+    this.routes.push(new Route(method, path, handlers));
     return this;
   }
 
   mount(prefix: string, router: Router): Bagel {
-    router.handlers.forEach((handlers, key) => {
-      const [method, path] = key.split(' ');
-      const newKey = `${method} ${normalizeURLPath(prefix + path)}`;
-      this.handlers.set(newKey, [...this.middlewares, ...handlers]);
+    const routes = router.routes.map((route) => {
+      return new Route(
+        route.method,
+        normalizeURLPath(prefix + route.path),
+        route.handlers,
+      );
     });
+
+    this.routes.push(...routes);
+
     return this;
   }
 
   listen(port: number, callback?: ListenCallback) {
     const fetch: ServeOptions['fetch'] = async (req) => {
-      // Construct Bagel Request from Bun Request
-      const bagelRequest = await BagelRequest.from(req);
+      const { pathname } = new URL(req.url);
 
-      // Initialize Bagel Response instance
-      const bagelResponse = new BagelResponse();
-
-      // Get route handlers
-      const key = `${bagelRequest.method} ${bagelRequest.path}`;
-      const handlers = this.handlers.get(key);
+      // Find matching route
+      const route = this.routes.find((route) =>
+        route.match(req.method as Method, pathname),
+      );
 
       // Return 404 if there is no handlers for the route
-      if (!handlers) {
+      if (!route) {
         return new Response('Not found', { status: 404 });
       }
 
+      const { handlers } = route;
+
+      // Construct Bagel Request from Bun Request
+      const bagelRequest = await BagelRequest.from(req, route.params(pathname));
+      // Initialize Bagel Response instance
+      const bagelResponse = new BagelResponse();
+
       // Execute endpoint handlers
       let index = 0;
-      while(index < handlers.length) {
+      while (index < handlers.length) {
         const next = async () => {
           const handler = handlers[index++];
           if (!handler) return;
           await handler(bagelRequest, bagelResponse, next);
-        }
+        };
 
         await next();
       }
-      
+
       return bagelResponse.done();
     };
 
