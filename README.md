@@ -1,6 +1,9 @@
-# Bagel
+<h1>
+  <img width="40" align="left" alt="Bagel.js logo" src="https://user-images.githubusercontent.com/40446720/189159247-721df1ee-4dae-44bf-8693-257d0b78c576.svg" />
+  <span>Bagel</span>
+</h1>
 
-Bagel is a tiny and expressive web framework for [Bun.js](https://bun.sh/) for building web APIs.
+**Bagel** is a tiny and expressive web framework for [Bun.js](https://bun.sh/) for building web APIs.
 
 Inspired by [Express.js](https://expressjs.com/) and [Koa.js](https://koajs.com/).
 
