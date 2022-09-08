@@ -6,7 +6,8 @@
     "email": "kakengloh@gmail.com",
     "url": "https://github.com/kakengloh"
   },
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
@@ -26,10 +27,14 @@
     "restful",
     "router",
     "app",
-    "api"
+    "api",
+    "typescript"
   ],
   "license": "MIT",
   "dependencies": {
     "path-to-regexp": "^6.2.1"
+  },
+  "scripts": {
+    "prepublish": "tsc"
   }
 }
