@@ -20,7 +20,7 @@ Here we treat **Typescript** as first class citizen, hence every request handler
 ### Basic
 
 ```typescript
-import { Bagel, Router } from 'bagel-js'; // Haven't published yet
+import { Bagel, Router } from '@kakengloh/bagel';
 
 const app = new Bagel();
 
@@ -31,7 +31,7 @@ app.listen(3000);
 
 ### Router
 ```typescript
-import { Bagel, Router } from 'bagel-js'; // Haven't published yet
+import { Bagel, Router } from '@kakengloh/bagel';
 
 // Create items router
 const items = new Router();
@@ -52,7 +52,7 @@ app.listen(3000);
 
 ### Middleware
 ```typescript
-import { Bagel, Router } from 'bagel-js'; // Haven't published yet
+import { Bagel, Router } from '@kakengloh/bagel';
 
 const app = new Bagel();
 
@@ -74,7 +74,7 @@ app.listen(3000);
 
 ### Strong typing
 ```typescript
-import { Bagel, Handler } from 'bagel-js'; // Haven't published yet
+import { Bagel, Handler } from '@kakengloh/bagel';
 
 // Entity
 interface Bread {
