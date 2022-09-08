@@ -15,6 +15,12 @@ Here we treat **Typescript** as first class citizen, hence every request handler
 
 ✅ Strongly typed route handlers
 
+## Installation
+
+```bash
+bun add @kakengloh/bagel
+```
+
 ## Examples
 
 ### Basic
