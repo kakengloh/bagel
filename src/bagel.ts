@@ -13,7 +13,7 @@ interface BagelOptions {
 
 export class Bagel {
   private readonly opts: BagelOptions;
-  private readonly routes: Route[];
+  public readonly routes: Route[];
   private readonly middlewares: Handler[];
 
   constructor(opts: BagelOptions = {}) {

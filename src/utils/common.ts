@@ -4,6 +4,10 @@ export const normalizeURLPath = (text: string): string => {
     text = '/' + text;
   }
 
+  if (text === '/') {
+    return text;
+  }
+
   // Remove trailing slash
-  return decodeURI(text).replace(/\/+$/, '');
+  return decodeURI(text).replace(/\/+/g, '/').replace(/\/+$/, '');
 };
