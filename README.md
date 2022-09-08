@@ -1,8 +1,8 @@
 # Bagel
 
-Bagel is a tiny and expressive web framework for Bun.js for building web APIs.
+Bagel is a tiny and expressive web framework for [Bun.js](https://bun.sh/) for building web APIs.
 
-Inspired by Express.js and Koa.js.
+Inspired by [Express.js](https://expressjs.com/) and [Koa.js](https://koajs.com/).
 
 Here we treat **Typescript** as first class citizen, hence every request handler supports **generic** and you may specify your own typing of request params, query, body and response body.
 
