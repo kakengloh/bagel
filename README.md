@@ -133,3 +133,11 @@ app.post('/bakeries/:bakeryId/breads', createBread);
 app.listen(3000);
 
 ```
+
+## Benchmark
+Below is a simple benchmark of **Bagel.js** and **Express.js** conducted on my machine using [autocannon](https://github.com/mcollina/autocannon) (12 threads, 500 concurrent connections, 10 seconds)
+
+> The output shows that Bagel.js can handle ~2.67x more requests than Express.js
+
+<img width="612" alt="Screenshot 2022-09-09 at 9 19 02 PM" src="https://user-images.githubusercontent.com/40446720/189360153-4178e19d-0d80-40b0-ad2e-404bec214e8b.png">
+<img width="602" alt="Screenshot 2022-09-09 at 9 15 42 PM" src="https://user-images.githubusercontent.com/40446720/189360193-f5a68eb0-535b-4f0d-bde0-0cf680477fac.png">
