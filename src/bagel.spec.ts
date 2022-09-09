@@ -121,6 +121,7 @@ describe('mount', () => {
   expect(app.routes[0].method).toBe('GET');
   expect(app.routes[0].path).toBe('/items');
   expect(app.routes[0].handlers.length).toBe(1);
+
   expect(app.routes[1].method).toBe('POST');
   expect(app.routes[1].path).toBe('/items');
   expect(app.routes[1].handlers.length).toBe(1);
