@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'bun:test';
+import * as test from 'bun:test';
 import { Router } from './router';
+import { Bagel } from './bagel';
 
 describe('register', () => {
   it('should register a GET / route with 2 handlers', () => {
@@ -124,4 +126,75 @@ describe('mount', () => {
   expect(router.routes[1].method).toBe('GET');
   expect(router.routes[1].path).toBe('/items');
   expect(router.routes[1].handlers.length).toBe(1);
+});
+
+// Temp implementation for now as `afterAll` doesn't seems to work
+// So we will listen the server before each test and stop it after each test
+describe('listen', () => {
+  const app = new Bagel();
+
+  // Disabling TS due to lack of typing from 'bun:test'
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  test.beforeEach(() => {
+    app.listen(3000);
+  });
+
+  it('should return response text', async () => {
+    app.get('/response-text', async (req, res) => res.sendStatus(200));
+
+    const response = await fetch('http://localhost:3000/response-text');
+    expect(response.status).toBe(200);
+    const text = await response.text();
+    expect(text).toBe('OK');
+
+    app.stop();
+  });
+
+  it('should return response JSON', async () => {
+    app.get('/response-json', async (req, res) => res.json({ hello: 'world' }));
+
+    const response = await fetch('http://localhost:3000/response-json');
+    expect(response.status).toBe(200);
+    const json = await response.json<Record<string, unknown>>();
+    expect(json.hello).toBe('world');
+
+    app.stop();
+  });
+
+  it('should parse path params', async () => {
+    app.get('/path/:var', async (req, res) => res.json(req.params));
+
+    const response = await fetch('http://localhost:3000/path/hello');
+    expect(response.status).toBe(200);
+    const json = await response.json<Record<string, unknown>>();
+    expect(json.var).toBe('hello');
+
+    app.stop();
+  });
+
+  it('should parse query params', async () => {
+    app.get('/query', async (req, res) => res.json(req.query));
+
+    const response = await fetch('http://localhost:3000/query?a=1&b=2');
+    expect(response.status).toBe(200);
+    const json = await response.json<Record<string, unknown>>();
+    expect(json.a).toBe('1');
+    expect(json.b).toBe('2');
+
+    app.stop();
+  });
+
+  it('should parse json body', async () => {
+    app.get('/request-json', async (req, res) => res.json(req.body));
+
+    const response = await fetch('http://localhost:3000/request-json', {
+      body: JSON.stringify({ hello: 'world' }),
+    });
+    expect(response.status).toBe(200);
+    const json = await response.json<Record<string, unknown>>();
+    expect(json.hello).toBe('world');
+
+    app.stop();
+  });
 });

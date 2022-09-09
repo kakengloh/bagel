@@ -1,4 +1,4 @@
-import { Errorlike, ServeOptions } from 'bun';
+import { Errorlike, ServeOptions, Server } from 'bun';
 import { Router } from './router';
 import { AnyHandler, BagelRequest, Handler, Method } from './request';
 import { BagelResponse } from './response';
@@ -15,6 +15,7 @@ export class Bagel {
   private readonly opts: BagelOptions;
   public readonly routes: Route[];
   private readonly middlewares: Handler[];
+  private server?: Server;
 
   constructor(opts: BagelOptions = {}) {
     this.opts = opts;
@@ -124,12 +125,20 @@ export class Bagel {
       return new Response(body);
     };
 
-    Bun.serve({
+    this.server = Bun.serve({
       port,
       fetch,
       error,
     });
 
     callback?.();
+  }
+
+  stop() {
+    if (!this.server) {
+      console.warn('Server has not started yet');
+      return;
+    }
+    this.server.stop();
   }
 }
