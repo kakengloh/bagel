@@ -9,6 +9,11 @@ Inspired by [Express.js](https://expressjs.com/) and [Koa.js](https://koajs.com/
 
 Here we treat **Typescript** as first class citizen, hence every request handler supports **generic** and you may specify your own typing of request params, query, body and response body.
 
+## Contents
+- [Features](#features)
+- [Examples](#examples)
+- [Benchmark](#benchmark)
+
 ## Features
 ✅ Routing
 
