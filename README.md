@@ -10,11 +10,13 @@ Inspired by [Express.js](https://expressjs.com/) and [Koa.js](https://koajs.com/
 Here we treat **Typescript** as first class citizen, hence every request handler supports **generic** and you may specify your own typing of request params, query, body and response body.
 
 ## Contents
+
 - [Features](#features)
 - [Examples](#examples)
 - [Benchmark](#benchmark)
 
 ## Features
+
 ✅ Routing
 
 ✅ Middlewares
@@ -44,6 +46,7 @@ app.listen(3000);
 ```
 
 ### Router
+
 ```typescript
 import { Bagel, Router } from '@kakengloh/bagel';
 
@@ -65,6 +68,7 @@ app.listen(3000);
 ```
 
 ### Middleware
+
 ```typescript
 import { Bagel, Router } from '@kakengloh/bagel';
 
@@ -87,6 +91,7 @@ app.listen(3000);
 ```
 
 ### Strong typing
+
 ```typescript
 import { Bagel, Handler } from '@kakengloh/bagel';
 
@@ -136,10 +141,30 @@ const app = new Bagel();
 app.post('/bakeries/:bakeryId/breads', createBread);
 
 app.listen(3000);
+```
 
+### Error handling
+
+```typescript
+import { Bagel } from '@kakengloh/bagel';
+
+const app = new Bagel({
+  // Every error thrown will go through this function
+  // Here you can return a custom response
+  error: async (res, err) => {
+    return res.status(400).json({ error: 'Bad request' });
+  },
+});
+
+app.get('/error', async () => {
+  throw new Error('Some error');
+});
+
+app.listen(3000);
 ```
 
 ## Benchmark
+
 Below is a simple benchmark of **Bagel.js** and **Express.js** conducted on my machine using [autocannon](https://github.com/mcollina/autocannon) (12 threads, 500 concurrent connections, 10 seconds)
 
 > The output shows that Bagel.js can handle ~2.67x more requests than Express.js
