@@ -4,11 +4,12 @@ import { AnyHandler, BagelRequest, Handler, Method } from './request';
 import { BagelResponse } from './response';
 import { normalizeURLPath } from './utils/common';
 import { Route } from './route';
+import * as logger from './utils/logger';
 
 type ListenCallback = (err?: Errorlike) => void;
 
 interface BagelOptions {
-  onError?: (err: Errorlike) => any;
+  error?: (res: BagelResponse, err: Errorlike) => Promise<any>;
 }
 
 export class Bagel {
@@ -121,8 +122,19 @@ export class Bagel {
     };
 
     const error: ServeOptions['error'] = (err: Errorlike) => {
-      const body: BlobPart = this.opts.onError?.(err) ?? err;
-      return new Response(body);
+      logger.error(err);
+
+      // Default status 500
+      const bagelResponse = new BagelResponse().status(500);
+      bagelResponse.send('');
+
+      // Run custom error function if exists
+      if (this.opts.error) {
+        this.opts.error?.(bagelResponse, err);
+        return bagelResponse.done();
+      }
+
+      return bagelResponse.done();
     };
 
     this.server = Bun.serve({
@@ -130,6 +142,8 @@ export class Bagel {
       fetch,
       error,
     });
+
+    logger.info(`Bun is running on port ${port} (Press CTRL+C to quit)`);
 
     callback?.();
   }

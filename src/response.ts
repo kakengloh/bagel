@@ -20,6 +20,12 @@ export class BagelResponse<TResponseBody = Record<string, any>> {
     return this;
   }
 
+  setHeader(key: string, value: any): BagelResponse<TResponseBody> {
+    this.opts.headers = (this.opts.headers || {}) as Record<string, string>;
+    this.opts.headers[key] = value;
+    return this;
+  }
+
   json(body: TResponseBody): void {
     if (this.response) {
       throw new Error('Response is already set');

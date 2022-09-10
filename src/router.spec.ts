@@ -197,4 +197,15 @@ describe('listen', () => {
 
     app.stop();
   });
+
+  it('should return response with 500 status code', async () => {
+    app.get('/e500', async () => {
+      throw new Error('error');
+    });
+
+    const response = await fetch('http://localhost:3000/e500');
+    expect(response.status).toBe(500);
+
+    app.stop();
+  });
 });
