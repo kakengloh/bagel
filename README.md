@@ -3,6 +3,9 @@
   <span>Bagel</span>
 </h1>
 
+![Bagel CI status](https://github.com/kakengloh/bagel/actions/workflows/ci.yml/badge.svg)
+![Bagel NPM version](https://img.shields.io/npm/v/@kakengloh/bagel)
+
 **Bagel** is a tiny and expressive web framework for [Bun.js](https://bun.sh/) for building web APIs.
 
 Inspired by [Express.js](https://expressjs.com/) and [Koa.js](https://koajs.com/).
