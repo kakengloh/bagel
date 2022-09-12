@@ -137,7 +137,6 @@ describe('listen', () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   test.beforeEach(() => {
-    console.log('beforeEach');
     app.listen(9999);
   });
 
