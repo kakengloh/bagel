@@ -137,13 +137,14 @@ describe('listen', () => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   test.beforeEach(() => {
-    app.listen(3000);
+    console.log('beforeEach');
+    app.listen(9999);
   });
 
   it('should return response text', async () => {
     app.get('/response-text', async (req, res) => res.sendStatus(200));
 
-    const response = await fetch('http://localhost:3000/response-text');
+    const response = await fetch('://127.0.0.1:9999/response-text');
     expect(response.status).toBe(200);
     const text = await response.text();
     expect(text).toBe('OK');
@@ -154,7 +155,7 @@ describe('listen', () => {
   it('should return response JSON', async () => {
     app.get('/response-json', async (req, res) => res.json({ hello: 'world' }));
 
-    const response = await fetch('http://localhost:3000/response-json');
+    const response = await fetch('://127.0.0.1:9999/response-json');
     expect(response.status).toBe(200);
     const json = await response.json<Record<string, unknown>>();
     expect(json.hello).toBe('world');
@@ -165,7 +166,7 @@ describe('listen', () => {
   it('should parse path params', async () => {
     app.get('/path/:var', async (req, res) => res.json(req.params));
 
-    const response = await fetch('http://localhost:3000/path/hello');
+    const response = await fetch('://127.0.0.1:9999/path/hello');
     expect(response.status).toBe(200);
     const json = await response.json<Record<string, unknown>>();
     expect(json.var).toBe('hello');
@@ -176,7 +177,7 @@ describe('listen', () => {
   it('should parse query params', async () => {
     app.get('/query', async (req, res) => res.json(req.query));
 
-    const response = await fetch('http://localhost:3000/query?a=1&b=2');
+    const response = await fetch('://127.0.0.1:9999/query?a=1&b=2');
     expect(response.status).toBe(200);
     const json = await response.json<Record<string, unknown>>();
     expect(json.a).toBe('1');
@@ -188,7 +189,7 @@ describe('listen', () => {
   it('should parse json body', async () => {
     app.get('/request-json', async (req, res) => res.json(req.body));
 
-    const response = await fetch('http://localhost:3000/request-json', {
+    const response = await fetch('://127.0.0.1:9999/request-json', {
       body: JSON.stringify({ hello: 'world' }),
     });
     expect(response.status).toBe(200);
@@ -203,7 +204,7 @@ describe('listen', () => {
       throw new Error('error');
     });
 
-    const response = await fetch('http://localhost:3000/e500');
+    const response = await fetch('://127.0.0.1:9999/e500');
     expect(response.status).toBe(500);
 
     app.stop();
