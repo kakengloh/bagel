@@ -168,9 +168,9 @@ describe('mount', () => {
     router.get('/items', async (_, res) => res.send('OK'));
     router.get('/users', async (_, res) => res.send('OK'));
     app.mount('/v1', router);
-    app.listen(1009);
+    app.listen(9007);
 
-    const response = await fetch('http://localhost:1009/v1/items');
+    const response = await fetch('http://localhost:9007/v1/items');
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe('OK');
