@@ -1,6 +1,6 @@
 {
   "name": "@kakengloh/bagel",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": {
     "name": "KaKeng Loh",
     "email": "kakengloh@gmail.com",
@@ -9,11 +9,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "devDependencies": {
+    "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
-    "bun-types": "^0.1.10",
+    "bun-types": "^0.4.0",
     "eslint": "^8.23.0",
     "prettier": "^2.7.1",
+    "sinon": "^15.0.1",
     "typescript": "^4.8.2"
   },
   "description": "Tiny and expressive web framework for Bun.js",

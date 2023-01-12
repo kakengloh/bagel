@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import sinon from 'sinon';
 import { Bagel } from './bagel';
 import { Router } from './router';
 
@@ -90,6 +91,34 @@ describe('patch', () => {
     expect(app.routes[0].method).toBe('PATCH');
     expect(app.routes[0].path).toBe('/');
     expect(app.routes[0].handlers.length).toBe(2);
+  });
+});
+
+describe('use', () => {
+  it('should run middlewares', async () => {
+    const app = new Bagel();
+
+    const fn = () => {
+      //
+    };
+
+    const spy = sinon.spy(fn);
+
+    app.use(async (req, res, next) => {
+      spy();
+      next();
+    });
+
+    app.get('/', async (_, res) => res.send('OK'));
+
+    app.listen(9999);
+
+    const response = await fetch('http://localhost:9999');
+
+    expect(await response.text()).toBe('OK');
+    expect(spy.calledOnce).toBeTruthy();
+
+    app.stop();
   });
 });
 

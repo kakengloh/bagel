@@ -61,6 +61,7 @@ export class BagelRequest<
     const { searchParams, pathname } = new URL(req.url);
 
     const body = await req.json();
+
     if (body instanceof Error) {
       throw body;
     }

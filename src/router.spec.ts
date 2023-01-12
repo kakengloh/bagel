@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'bun:test';
-import * as test from 'bun:test';
 import { Router } from './router';
 import { Bagel } from './bagel';
 
@@ -128,22 +127,13 @@ describe('mount', () => {
   expect(router.routes[1].handlers.length).toBe(1);
 });
 
-// Temp implementation for now as `afterAll` doesn't seems to work
-// So we will listen the server before each test and stop it after each test
 describe('listen', () => {
-  const app = new Bagel();
-
-  // Disabling TS due to lack of typing from 'bun:test'
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  test.beforeEach(() => {
-    app.listen(9999);
-  });
-
   it('should return response text', async () => {
-    app.get('/response-text', async (req, res) => res.sendStatus(200));
+    const app = new Bagel();
+    app.get('/', async (req, res) => res.sendStatus(200));
+    app.listen(1000);
 
-    const response = await fetch('://127.0.0.1:9999/response-text');
+    const response = await fetch('http://localhost:1000');
     expect(response.status).toBe(200);
     const text = await response.text();
     expect(text).toBe('OK');
@@ -152,9 +142,11 @@ describe('listen', () => {
   });
 
   it('should return response JSON', async () => {
-    app.get('/response-json', async (req, res) => res.json({ hello: 'world' }));
+    const app = new Bagel();
+    app.get('/', async (req, res) => res.json({ hello: 'world' }));
+    app.listen(1001);
 
-    const response = await fetch('://127.0.0.1:9999/response-json');
+    const response = await fetch('http://localhost:1001');
     expect(response.status).toBe(200);
     const json = await response.json<Record<string, unknown>>();
     expect(json.hello).toBe('world');
@@ -163,9 +155,11 @@ describe('listen', () => {
   });
 
   it('should parse path params', async () => {
+    const app = new Bagel();
     app.get('/path/:var', async (req, res) => res.json(req.params));
+    app.listen(1002);
 
-    const response = await fetch('://127.0.0.1:9999/path/hello');
+    const response = await fetch('http://localhost:1002/path/hello');
     expect(response.status).toBe(200);
     const json = await response.json<Record<string, unknown>>();
     expect(json.var).toBe('hello');
@@ -174,9 +168,11 @@ describe('listen', () => {
   });
 
   it('should parse query params', async () => {
-    app.get('/query', async (req, res) => res.json(req.query));
+    const app = new Bagel();
+    app.get('/', async (req, res) => res.json(req.query));
+    app.listen(1003);
 
-    const response = await fetch('://127.0.0.1:9999/query?a=1&b=2');
+    const response = await fetch('http://localhost:1003/?a=1&b=2');
     expect(response.status).toBe(200);
     const json = await response.json<Record<string, unknown>>();
     expect(json.a).toBe('1');
@@ -186,12 +182,17 @@ describe('listen', () => {
   });
 
   it('should parse json body', async () => {
-    app.get('/request-json', async (req, res) => res.json(req.body));
+    const app = new Bagel();
+    app.post('/', async (req, res) => res.json(req.body));
+    app.listen(1004);
 
-    const response = await fetch('://127.0.0.1:9999/request-json', {
+    const response = await fetch('http://localhost:1004', {
+      method: 'POST',
       body: JSON.stringify({ hello: 'world' }),
     });
+
     expect(response.status).toBe(200);
+
     const json = await response.json<Record<string, unknown>>();
     expect(json.hello).toBe('world');
 
@@ -199,11 +200,13 @@ describe('listen', () => {
   });
 
   it('should return response with 500 status code', async () => {
-    app.get('/e500', async () => {
+    const app = new Bagel();
+    app.get('/', async () => {
       throw new Error('error');
     });
+    app.listen(1005);
 
-    const response = await fetch('://127.0.0.1:9999/e500');
+    const response = await fetch('http://localhost:1005');
     expect(response.status).toBe(500);
 
     app.stop();
