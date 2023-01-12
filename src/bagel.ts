@@ -72,15 +72,14 @@ export class Bagel {
   }
 
   mount(prefix: string, router: Router): Bagel {
-    const routes = router.routes.map((route) => {
-      return new Route(
+    router.routes.forEach((route) => {
+      this.register(
         route.method,
         normalizeURLPath(prefix + route.path),
-        route.handlers,
+        ...this.middlewares,
+        ...route.handlers,
       );
     });
-
-    this.routes.push(...routes);
 
     return this;
   }

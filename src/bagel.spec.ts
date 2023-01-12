@@ -98,9 +98,7 @@ describe('use', () => {
   it('should run middlewares', async () => {
     const app = new Bagel();
 
-    const fn = () => {
-      //
-    };
+    const fn = () => null;
 
     const spy = sinon.spy(fn);
 
@@ -123,7 +121,7 @@ describe('use', () => {
 });
 
 describe('options', () => {
-  it('should register a PATCH / route with 2 handlers', () => {
+  it('should register an OPTIONS / route with 2 handlers', () => {
     const app = new Bagel();
     app.options(
       '/',
@@ -138,20 +136,46 @@ describe('options', () => {
 });
 
 describe('mount', () => {
-  const app = new Bagel();
+  it('should mount sub router', () => {
+    const app = new Bagel();
 
-  const router = new Router();
-  router.get('/items', async () => true);
-  router.post('/items', async () => true);
+    const router = new Router();
+    router.get('/items', async () => true);
+    router.post('/items', async () => true);
 
-  app.mount('/v1', router);
+    app.mount('/v1', router);
 
-  expect(app.routes.length).toBe(2);
-  expect(app.routes[0].method).toBe('GET');
-  expect(app.routes[0].path).toBe('/items');
-  expect(app.routes[0].handlers.length).toBe(1);
+    expect(app.routes.length).toBe(2);
+    expect(app.routes[0].method).toBe('GET');
+    expect(app.routes[0].path).toBe('/v1/items');
+    expect(app.routes[0].handlers.length).toBe(1);
 
-  expect(app.routes[1].method).toBe('POST');
-  expect(app.routes[1].path).toBe('/items');
-  expect(app.routes[1].handlers.length).toBe(1);
+    expect(app.routes[1].method).toBe('POST');
+    expect(app.routes[1].path).toBe('/v1/items');
+    expect(app.routes[1].handlers.length).toBe(1);
+  });
+
+  it('should call middlewares for subrouter', async () => {
+    const app = new Bagel();
+    const spy = sinon.spy(() => null);
+
+    app.use(async (req, res, next) => {
+      spy();
+      next();
+    });
+
+    const router = new Router();
+    router.get('/items', async (_, res) => res.send('OK'));
+    router.get('/users', async (_, res) => res.send('OK'));
+    app.mount('/v1', router);
+    app.listen(1006);
+
+    const response = await fetch('http://localhost:1006/v1/items');
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe('OK');
+    expect(spy.calledOnce).toBeTruthy();
+
+    app.stop();
+  });
 });
