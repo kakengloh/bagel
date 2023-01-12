@@ -8,6 +8,9 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
